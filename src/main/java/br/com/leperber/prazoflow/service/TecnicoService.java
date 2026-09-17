@@ -2,6 +2,7 @@ package br.com.leperber.prazoflow.service;
 
 import br.com.leperber.prazoflow.entity.StatusPadrao;
 import br.com.leperber.prazoflow.entity.Tecnico;
+import br.com.leperber.prazoflow.exception.TecnicoNaoEncontradoException;
 import br.com.leperber.prazoflow.repository.TecnicoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,12 +36,8 @@ public class TecnicoService {
     }
 
     public Tecnico buscarId(Long id){
-
-        if (!tecnicoRepository.existsById(id)){
-            throw new IllegalArgumentException("Tecnico não encontrado!");
-        }
-
-        return tecnicoRepository.findById(id).get();
+        return tecnicoRepository.findById(id)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
     }
 
     public Page<Tecnico> buscarTecnicos(Pageable pageable){
