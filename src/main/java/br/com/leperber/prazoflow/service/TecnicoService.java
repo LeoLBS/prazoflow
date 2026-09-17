@@ -65,14 +65,13 @@ public class TecnicoService {
 
     public Tecnico alterarNome(Long id, String nome){
 
-        if(!tecnicoRepository.existsById(id)){
-            throw new IllegalArgumentException("Nenhum tecnico foi localizado com esse ID!");
-        }
         if (!StringUtils.hasText(nome)){
             throw new IllegalArgumentException("O Nome não pode ser vazio ou nulo!");
         }
 
-        Tecnico tecnico = tecnicoRepository.findById(id).get();
+        Tecnico tecnico = tecnicoRepository.findById(id)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+
         tecnico.setNome(nome);
 
         return tecnicoRepository.save(tecnico);
