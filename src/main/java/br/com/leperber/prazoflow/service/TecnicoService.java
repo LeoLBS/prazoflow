@@ -59,11 +59,8 @@ public class TecnicoService {
     }
 
     public Tecnico buscarIdDiscord(String codigoIdDiscord){
-        if(!tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscord)){
-            throw new IllegalArgumentException("Nenhum tecnico foi localizado com essas código id discord!");
-        }
-
-        return tecnicoRepository.findByCodigoIdDiscord(codigoIdDiscord).get();
+        return tecnicoRepository.findByCodigoIdDiscord(codigoIdDiscord)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o código Discord: " + codigoIdDiscord));
     }
 
     public Tecnico alterarNome(Long id, String nome){
