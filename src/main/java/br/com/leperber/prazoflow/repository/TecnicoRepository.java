@@ -9,4 +9,7 @@ import java.util.Optional;
 public interface TecnicoRepository extends JpaRepository<Tecnico, Long>{
     List<Tecnico> findByNomeContaining(String nome);
     Optional<Tecnico> findByCodigoIdDiscord(String codigoIdDiscord);
+    Boolean existsByCodigoIdDiscord(String codigoIdDiscord);
+    Boolean existsByEmail(String email);
+    Boolean existsByNomeContaining(String nome);
 }
