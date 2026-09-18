@@ -40,20 +40,10 @@ public class TecnicoService {
     }
 
     public Page<Tecnico> buscarTecnicos(Pageable pageable){
-
-        if(tecnicoRepository.findAll(pageable).isEmpty()){
-            throw new IllegalArgumentException("Não há nhenhum registro de tecnico!");
-        }
-
         return tecnicoRepository.findAll(pageable);
     }
 
     public List<Tecnico> buscarTecnicosNome(String nome){
-
-        if (!tecnicoRepository.existsByNomeContaining(nome)){
-            throw new IllegalArgumentException("Nenhum Nome localizado com essas palavras!");
-        }
-
         return tecnicoRepository.findByNomeContaining(nome);
     }
 
