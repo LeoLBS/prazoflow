@@ -10,4 +10,5 @@ import java.util.List;
 public interface DemandaRepository extends JpaRepository<Demanda, Long> {
     List<Demanda> findByDataVencimentoAndStatus(LocalDate dataVencimento, StatusDemanda status);
     List<Demanda> findByStatusAndDataVencimentoBefore(StatusDemanda status, LocalDate dataVencimento);
+    List<Demanda> findByTecnico_Id(Long tecnicoId);
 }
