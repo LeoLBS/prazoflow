@@ -21,18 +21,17 @@ public class TecnicoService {
     }
 
     public Tecnico criar(Tecnico tecnico){
-        if(tecnicoRepository.existsByCodigoIdDiscord(tecnico.getCodigoIdDiscord())){
-            throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
-        }
-        if(tecnicoRepository.existsByEmail(tecnico.getEmail())){
-            throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
-        }
         if(!StringUtils.hasText(tecnico.getNome())){
             throw new IllegalArgumentException("O Nome não pode ser vazio ou nulo!");
         }
+        if(StringUtils.hasText(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(tecnico.getCodigoIdDiscord())){
+            throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
+        }
+        if(StringUtils.hasText(tecnico.getEmail()) && tecnicoRepository.existsByEmail(tecnico.getEmail())){
+            throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
+        }
 
         return tecnicoRepository.save(tecnico);
-
     }
 
     public Tecnico buscarId(Long id){
