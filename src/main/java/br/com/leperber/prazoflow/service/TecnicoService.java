@@ -78,45 +78,42 @@ public class TecnicoService {
     }
 
     public Tecnico alterarEmail(Long id, String email){
-        if(!tecnicoRepository.existsById(id)){
-            throw new IllegalArgumentException("Nenhum tecnico foi localizado com esse ID!");
-        }
         if (!StringUtils.hasText(email)){
             throw new IllegalArgumentException("O email não pode ser vazio ou nulo!");
         }
-        if(tecnicoRepository.existsByEmail(email)){
+
+        Tecnico tecnico = tecnicoRepository.findById(id)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+
+        if (!email.equals(tecnico.getEmail()) && tecnicoRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
         }
 
-        Tecnico tecnico = tecnicoRepository.findById(id).get();
         tecnico.setEmail(email);
 
         return tecnicoRepository.save(tecnico);
     }
 
     public Tecnico alterarIdDiscord(Long id, String codigoIdDiscord){
-        if(!tecnicoRepository.existsById(id)){
-            throw new IllegalArgumentException("Nenhum tecnico foi localizado com esse ID!");
-        }
         if (!StringUtils.hasText(codigoIdDiscord)){
             throw new IllegalArgumentException("O código ID do Discord não pode ser vazio ou nulo!");
         }
-        if(tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscord)){
+
+        Tecnico tecnico = tecnicoRepository.findById(id)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+
+        if (!codigoIdDiscord.equals(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscord)) {
             throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
         }
 
-        Tecnico tecnico = tecnicoRepository.findById(id).get();
         tecnico.setCodigoIdDiscord(codigoIdDiscord);
 
         return tecnicoRepository.save(tecnico);
     }
 
     public Tecnico alterarStatus(Long id, StatusPadrao statusPadrao){
-        if(!tecnicoRepository.existsById(id)){
-            throw new IllegalArgumentException("Nenhum tecnico foi localizado com esse ID!");
-        }
-
-        Tecnico tecnico = tecnicoRepository.findById(id).get();
+        Tecnico tecnico = tecnicoRepository.findById(id)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
 
         if (tecnico.getStatus().equals(statusPadrao)){
             throw new IllegalArgumentException("O status do tecnico ja se encontra como " + statusPadrao);
