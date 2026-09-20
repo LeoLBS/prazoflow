@@ -51,7 +51,7 @@ public class DemandaService {
                 .orElseThrow(() -> new DemandaNaoEncontradaException("Demanda não encontrada com o ID: " + id));
     }
 
-    public Page<Demanda> buscarTodas(Pageable pageable) {
+    public Page<Demanda> buscarDemandas(Pageable pageable) {
         return demandaRepository.findAll(pageable);
     }
 
@@ -116,7 +116,7 @@ public class DemandaService {
                 .orElseThrow(() -> new DemandaNaoEncontradaException("Demanda não encontrada com o ID: " + id));
 
         Tecnico tecnico = tecnicoRepository.findById(tecnicoId)
-                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + tecnicoId));
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + tecnicoId));
 
         if (tecnico.getStatus() != StatusPadrao.ATIVO) {
             throw new IllegalArgumentException("Não é possível atribuir uma demanda a um técnico inativo!");
