@@ -19,7 +19,7 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Usuario cadastrar(Usuario usuario) {
+    public Usuario criar(Usuario usuario) {
         if (!StringUtils.hasText(usuario.getUsuario())) {
             throw new IllegalArgumentException("O nome de usuário não pode ser vazio ou nulo!");
         }
@@ -42,7 +42,7 @@ public class UsuarioService {
 
     public Usuario buscarPorUsuario(String usuario) {
         return usuarioRepository.findByUsuario(usuario)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Nenhum usuario foi localizado com o login: " + usuario));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario não encontrado com o login: " + usuario));
     }
 
     public Usuario alterarSenha(Long id, String senhaAtual, String novaSenha) {
