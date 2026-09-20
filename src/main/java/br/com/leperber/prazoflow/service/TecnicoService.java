@@ -49,7 +49,7 @@ public class TecnicoService {
 
     public Tecnico buscarIdDiscord(String codigoIdDiscord){
         return tecnicoRepository.findByCodigoIdDiscord(codigoIdDiscord)
-                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o código Discord: " + codigoIdDiscord));
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o código Discord: " + codigoIdDiscord));
     }
 
     public Tecnico alterarNome(Long id, String nome){
@@ -59,7 +59,7 @@ public class TecnicoService {
         }
 
         Tecnico tecnico = tecnicoRepository.findById(id)
-                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
 
         tecnico.setNome(nome);
 
@@ -72,7 +72,7 @@ public class TecnicoService {
         }
 
         Tecnico tecnico = tecnicoRepository.findById(id)
-                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
 
         if (!email.equals(tecnico.getEmail()) && tecnicoRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
@@ -89,7 +89,7 @@ public class TecnicoService {
         }
 
         Tecnico tecnico = tecnicoRepository.findById(id)
-                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
 
         if (!codigoIdDiscord.equals(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscord)) {
             throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
@@ -102,7 +102,7 @@ public class TecnicoService {
 
     public Tecnico alterarStatus(Long id, StatusPadrao statusPadrao){
         Tecnico tecnico = tecnicoRepository.findById(id)
-                .orElseThrow(() -> new TecnicoNaoEncontradoException("Nenhum tecnico foi localizado com o ID: " + id));
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
 
         if (tecnico.getStatus().equals(statusPadrao)){
             throw new IllegalArgumentException("O status do tecnico ja se encontra como " + statusPadrao);
