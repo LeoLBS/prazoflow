@@ -155,6 +155,10 @@ public class DemandaService {
             throw new IllegalArgumentException("A demanda já se encontra com o status " + statusDemanda);
         }
 
+        if (demanda.getStatus() == StatusDemanda.CONCLUIDO || demanda.getStatus() == StatusDemanda.CANCELADO) {
+            throw new IllegalArgumentException("Não é possível alterar o status de uma demanda concluída ou cancelada!");
+        }
+
         demanda.setStatus(statusDemanda);
 
         Demanda salva = demandaRepository.save(demanda);
