@@ -153,6 +153,12 @@ public class DemandaService {
 
         demanda.setStatus(statusDemanda);
 
-        return demandaRepository.save(demanda);
+        Demanda salva = demandaRepository.save(demanda);
+
+        if (statusDemanda == StatusDemanda.CONCLUIDO) {
+            notificacaoService.notificarConclusao(salva);
+        }
+
+        return salva;
     }
 }
