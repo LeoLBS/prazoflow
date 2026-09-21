@@ -35,7 +35,7 @@ O **PrazoFlow** nasceu para resolver esse problema no meu próprio setor, e tamb
 - [x] Camada de repositórios (Spring Data JPA)
 - [x] Camada de serviços — regras de negócio e validações
 - [x] Camada web (controllers + DTOs)
-- [ ] Autenticação (Spring Security)
+- [x] Autenticação (Spring Security)
 - [ ] Integração com o bot Discord (JDA)
 - [ ] Job agendado de verificação de prazos
 
