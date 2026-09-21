@@ -25,6 +25,10 @@ public class Demanda {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "status")
     private StatusDemanda status;
+    @Column(nullable = false, name = "alerta_prazo_enviado")
+    private boolean alertaPrazoEnviado;
+    @Column(nullable = false, name = "alerta_atraso_enviado")
+    private boolean alertaAtrasoEnviado;
 
     public Demanda() {}
 
@@ -64,6 +68,14 @@ public class Demanda {
         return status;
     }
 
+    public boolean isAlertaPrazoEnviado() {
+        return alertaPrazoEnviado;
+    }
+
+    public boolean isAlertaAtrasoEnviado() {
+        return alertaAtrasoEnviado;
+    }
+
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
@@ -86,6 +98,19 @@ public class Demanda {
 
     public void setStatus(StatusDemanda status) {
         this.status = status;
+    }
+
+    public void marcarAlertaPrazoEnviado() {
+        this.alertaPrazoEnviado = true;
+    }
+
+    public void marcarAlertaAtrasoEnviado() {
+        this.alertaAtrasoEnviado = true;
+    }
+
+    public void reiniciarAlertas() {
+        this.alertaPrazoEnviado = false;
+        this.alertaAtrasoEnviado = false;
     }
 
     @Override
