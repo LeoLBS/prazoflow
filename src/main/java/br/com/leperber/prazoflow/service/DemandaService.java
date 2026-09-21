@@ -107,6 +107,7 @@ public class DemandaService {
 
         demanda.setDataVencimento(novaDataVencimento);
         demanda.setStatus(StatusDemanda.PENDENTE);
+        demanda.reiniciarAlertas();
 
         return demandaRepository.save(demanda);
     }
@@ -122,7 +123,10 @@ public class DemandaService {
             throw new IllegalArgumentException("Não é possível atribuir uma demanda a um técnico inativo!");
         }
 
-        demanda.setTecnico(tecnico);
+        if (!tecnico.equals(demanda.getTecnico())) {
+            demanda.setTecnico(tecnico);
+            demanda.reiniciarAlertas();
+        }
 
         return demandaRepository.save(demanda);
     }
