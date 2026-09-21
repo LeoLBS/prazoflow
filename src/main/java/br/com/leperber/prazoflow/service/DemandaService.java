@@ -21,10 +21,14 @@ public class DemandaService {
 
     private final DemandaRepository demandaRepository;
     private final TecnicoRepository tecnicoRepository;
+    private final NotificacaoService notificacaoService;
 
-    public DemandaService(DemandaRepository demandaRepository, TecnicoRepository tecnicoRepository) {
+    public DemandaService(DemandaRepository demandaRepository,
+                          TecnicoRepository tecnicoRepository,
+                          NotificacaoService notificacaoService) {
         this.demandaRepository = demandaRepository;
         this.tecnicoRepository = tecnicoRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     public Demanda criar(Demanda demanda) {
@@ -105,11 +109,19 @@ public class DemandaService {
         Demanda demanda = demandaRepository.findById(id)
                 .orElseThrow(() -> new DemandaNaoEncontradaException("Demanda não encontrada com o ID: " + id));
 
+        LocalDate dataAnterior = demanda.getDataVencimento();
+
         demanda.setDataVencimento(novaDataVencimento);
         demanda.setStatus(StatusDemanda.PENDENTE);
         demanda.reiniciarAlertas();
 
-        return demandaRepository.save(demanda);
+        Demanda salva = demandaRepository.save(demanda);
+
+        if (!novaDataVencimento.equals(dataAnterior)) {
+            notificacaoService.notificarReagendamento(salva, dataAnterior);
+        }
+
+        return salva;
     }
 
     public Demanda atribuirTecnico(Long id, Long tecnicoId) {
