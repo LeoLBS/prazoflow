@@ -43,7 +43,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
-                .formLogin(form -> form.permitAll())
+                .formLogin(form -> form
+                        .successHandler((request, response, authentication) -> response.setStatus(200))
+                        .permitAll()
+                )
                 .exceptionHandling(exception -> exception
                         .defaultAuthenticationEntryPointFor(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
