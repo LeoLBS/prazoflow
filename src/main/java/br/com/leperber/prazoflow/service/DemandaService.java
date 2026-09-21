@@ -109,6 +109,10 @@ public class DemandaService {
         Demanda demanda = demandaRepository.findById(id)
                 .orElseThrow(() -> new DemandaNaoEncontradaException("Demanda não encontrada com o ID: " + id));
 
+        if (demanda.getStatus() == StatusDemanda.CONCLUIDO || demanda.getStatus() == StatusDemanda.CANCELADO) {
+            throw new IllegalArgumentException("Não é possível reagendar uma demanda concluída ou cancelada!");
+        }
+
         LocalDate dataAnterior = demanda.getDataVencimento();
 
         demanda.setDataVencimento(novaDataVencimento);
