@@ -18,7 +18,7 @@ public class AlertaJob {
         this.alertaService = alertaService;
     }
 
-    @Scheduled(cron = "${prazoflow.alertas.cron:0 0 8 * * *}", zone = "America/Sao_Paulo")
+    @Scheduled(cron = "${prazoflow.alertas.cron:0 0 8 * * MON-FRI}", zone = "America/Sao_Paulo")
     public void executarNoHorario() {
         executar("agendado");
     }
