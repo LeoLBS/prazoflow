@@ -6,6 +6,8 @@ import br.com.leperber.prazoflow.entity.StatusDemanda;
 import br.com.leperber.prazoflow.entity.StatusPadrao;
 import br.com.leperber.prazoflow.entity.Tecnico;
 import br.com.leperber.prazoflow.repository.DemandaRepository;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ public class AlertaService {
 
     private static final ZoneId FUSO = ZoneId.of("America/Sao_Paulo");
     private static final int DIAS_ANTECEDENCIA = 2;
-    private static final int LIMITE_CARACTERES = 1900; // Discord aceita 2000; sobra margem
+    private static final int LIMITE_FIELDS_POR_EMBED = 25; // limite do Discord por embed
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final DemandaRepository demandaRepository;
@@ -100,70 +103,89 @@ public class AlertaService {
 
     // Flag só é gravado DEPOIS da DM sair; se falhar, o próximo ciclo tenta de novo.
     private void enviarParaTecnico(Tecnico tecnico, List<Demanda> demandas, TipoAlerta tipo) {
-        String cabecalho = tipo.cabecalho(tecnico.getNome());
-        for (List<Demanda> lote : dividirEmLotes(demandas, cabecalho)) {
-            notificador.enviarDm(tecnico.getCodigoIdDiscord(), montarMensagem(cabecalho, lote)).join();
+        for (List<Demanda> lote : dividirEmLotes(demandas)) {
+            MessageEmbed embed = montarEmbed(tecnico, lote, tipo);
+            notificador.enviarDm(tecnico.getCodigoIdDiscord(), embed).join();
             lote.forEach(tipo::marcarEnviado);
             demandaRepository.saveAll(lote);
         }
     }
 
-    private List<List<Demanda>> dividirEmLotes(List<Demanda> demandas, String cabecalho) {
+    private List<List<Demanda>> dividirEmLotes(List<Demanda> demandas) {
         List<List<Demanda>> lotes = new ArrayList<>();
-        List<Demanda> atual = new ArrayList<>();
-        int tamanho = cabecalho.length();
-
-        for (Demanda demanda : demandas) {
-            int tamanhoLinha = formatarLinha(demanda).length() + 1;
-            if (!atual.isEmpty() && tamanho + tamanhoLinha > LIMITE_CARACTERES) {
-                lotes.add(atual);
-                atual = new ArrayList<>();
-                tamanho = cabecalho.length();
-            }
-            atual.add(demanda);
-            tamanho += tamanhoLinha;
-        }
-        if (!atual.isEmpty()) {
-            lotes.add(atual);
+        for (int i = 0; i < demandas.size(); i += LIMITE_FIELDS_POR_EMBED) {
+            lotes.add(demandas.subList(i, Math.min(i + LIMITE_FIELDS_POR_EMBED, demandas.size())));
         }
         return lotes;
     }
 
-    private String montarMensagem(String cabecalho, List<Demanda> lote) {
-        String linhas = lote.stream()
-                .map(this::formatarLinha)
-                .collect(Collectors.joining("\n"));
-        return cabecalho + "\n" + linhas;
+    private MessageEmbed montarEmbed(Tecnico tecnico, List<Demanda> lote, TipoAlerta tipo) {
+        EmbedBuilder builder = tipo.novoEmbed()
+                .setDescription("Olá, **" + tecnico.getNome() + "**! " + tipo.mensagemIntroducao());
+
+        for (Demanda demanda : lote) {
+            builder.addField(demanda.getTitulo(), formatarValorDoField(demanda, tipo), false);
+        }
+
+        return builder.build();
     }
 
-    private String formatarLinha(Demanda demanda) {
-        return "- **" + demanda.getTitulo() + "** (prazo: "
-                + demanda.getDataVencimento().format(FORMATO_DATA) + ")";
+    private String formatarValorDoField(Demanda demanda, TipoAlerta tipo) {
+        String prazo = "Prazo: " + demanda.getDataVencimento().format(FORMATO_DATA);
+        if (tipo == TipoAlerta.PRAZO) {
+            long diasRestantes = ChronoUnit.DAYS.between(LocalDate.now(FUSO), demanda.getDataVencimento());
+            prazo += " (" + descreverDiasRestantes(diasRestantes) + ")";
+        }
+        return prazo;
+    }
+
+    private String descreverDiasRestantes(long dias) {
+        if (dias == 0) {
+            return "vence hoje";
+        }
+        if (dias == 1) {
+            return "falta 1 dia";
+        }
+        return "faltam " + dias + " dias";
     }
 
     private enum TipoAlerta {
-        PRAZO("Olá, %s! Estas demandas vencem nos próximos dias:") {
+        PRAZO {
+            @Override
+            EmbedBuilder novoEmbed() {
+                return DiscordNotificador.novoEmbedDePrazo();
+            }
+
+            @Override
+            String mensagemIntroducao() {
+                return "Estas demandas vencem nos próximos dias:";
+            }
+
             @Override
             void marcarEnviado(Demanda demanda) {
                 demanda.marcarAlertaPrazoEnviado();
             }
         },
-        ATRASO("Olá, %s! Estas demandas passaram do prazo e ainda não foram concluídas:") {
+        ATRASO {
+            @Override
+            EmbedBuilder novoEmbed() {
+                return DiscordNotificador.novoEmbedDeAtraso();
+            }
+
+            @Override
+            String mensagemIntroducao() {
+                return "Estas demandas passaram do prazo e ainda não foram concluídas:";
+            }
+
             @Override
             void marcarEnviado(Demanda demanda) {
                 demanda.marcarAlertaAtrasoEnviado();
             }
         };
 
-        private final String modeloCabecalho;
+        abstract EmbedBuilder novoEmbed();
 
-        TipoAlerta(String modeloCabecalho) {
-            this.modeloCabecalho = modeloCabecalho;
-        }
-
-        String cabecalho(String nome) {
-            return modeloCabecalho.formatted(nome);
-        }
+        abstract String mensagemIntroducao();
 
         abstract void marcarEnviado(Demanda demanda);
     }
