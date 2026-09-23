@@ -4,6 +4,8 @@ import br.com.leperber.prazoflow.bot.DiscordNotificador;
 import br.com.leperber.prazoflow.entity.Demanda;
 import br.com.leperber.prazoflow.entity.StatusPadrao;
 import br.com.leperber.prazoflow.entity.Tecnico;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,19 +29,23 @@ public class NotificacaoService {
 
     public void notificarReagendamento(Demanda demanda, LocalDate dataAnterior) {
         enviarAoResponsavel(demanda, "reagendamento", nome ->
-                "Olá, %s! O prazo da demanda **%s** foi reagendado de %s para %s."
-                        .formatted(nome, demanda.getTitulo(),
-                                dataAnterior.format(FORMATO_DATA),
-                                demanda.getDataVencimento().format(FORMATO_DATA)));
+                DiscordNotificador.novoEmbedDeReagendamento()
+                        .setDescription("Olá, **%s**! O prazo da demanda **%s** foi reagendado."
+                                .formatted(nome, demanda.getTitulo()))
+                        .addField("Prazo anterior", dataAnterior.format(FORMATO_DATA), true)
+                        .addField("Novo prazo", demanda.getDataVencimento().format(FORMATO_DATA), true)
+                        .build());
     }
 
     public void notificarConclusao(Demanda demanda) {
         enviarAoResponsavel(demanda, "conclusao", nome ->
-                "Parabéns, %s! A demanda **%s** foi concluída. Obrigado pela entrega!"
-                        .formatted(nome, demanda.getTitulo()));
+                DiscordNotificador.novoEmbedDeConclusao()
+                        .setDescription("Parabéns, **%s**! A demanda **%s** foi concluída. Obrigado pela entrega! 🎉"
+                                .formatted(nome, demanda.getTitulo()))
+                        .build());
     }
 
-    private void enviarAoResponsavel(Demanda demanda, String tipo, Function<String, String> montarMensagem) {
+    private void enviarAoResponsavel(Demanda demanda, String tipo, Function<String, MessageEmbed> montarEmbed) {
         Tecnico tecnico = demanda.getTecnico();
         if (tecnico == null
                 || tecnico.getStatus() != StatusPadrao.ATIVO
@@ -50,7 +56,7 @@ public class NotificacaoService {
         }
 
         try {
-            notificador.enviarDm(tecnico.getCodigoIdDiscord(), montarMensagem.apply(tecnico.getNome()))
+            notificador.enviarDm(tecnico.getCodigoIdDiscord(), montarEmbed.apply(tecnico.getNome()))
                     .exceptionally(ex -> {
                         Throwable causa = ex.getCause() != null ? ex.getCause() : ex;
                         log.warn("Nao foi possivel enviar notificacao de {} ao tecnico {}: {}",
