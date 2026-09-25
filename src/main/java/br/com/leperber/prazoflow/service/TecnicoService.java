@@ -31,6 +31,8 @@ public class TecnicoService {
             throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
         }
 
+        tecnico.setStatus(StatusPadrao.ATIVO);
+
         return tecnicoRepository.save(tecnico);
     }
 
