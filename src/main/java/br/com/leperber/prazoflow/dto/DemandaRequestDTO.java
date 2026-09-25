@@ -12,7 +12,6 @@ public record DemandaRequestDTO(
         @NotBlank(message = "A descrição não pode ser vazia ou nula!") String descricao,
         @NotNull(message = "A data de vencimento não pode ser nula!")
         @Future(message = "A data de vencimento deve estar no futuro!")
-        @DiaUtilValido
         LocalDate dataVencimento,
         String observacao
 ) {

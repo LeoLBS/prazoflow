@@ -5,9 +5,11 @@ import br.com.leperber.prazoflow.entity.StatusDemanda;
 import br.com.leperber.prazoflow.entity.StatusPadrao;
 import br.com.leperber.prazoflow.entity.Tecnico;
 import br.com.leperber.prazoflow.exception.DemandaNaoEncontradaException;
+import br.com.leperber.prazoflow.exception.PrazoInvalidoException;
 import br.com.leperber.prazoflow.exception.TecnicoNaoEncontradoException;
 import br.com.leperber.prazoflow.repository.DemandaRepository;
 import br.com.leperber.prazoflow.repository.TecnicoRepository;
+import br.com.leperber.prazoflow.util.DiaUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,9 @@ public class DemandaService {
         }
         if (demanda.getDataVencimento().isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("A data de vencimento não pode estar no passado!");
+        }
+        if (!DiaUtil.ehDiaUtil(demanda.getDataVencimento())) {
+            throw new PrazoInvalidoException("O prazo deve cair em um dia útil (segunda a sexta)!");
         }
 
         demanda.setStatus(StatusDemanda.PENDENTE);
@@ -104,6 +109,9 @@ public class DemandaService {
         }
         if (novaDataVencimento.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("A nova data de vencimento não pode estar no passado!");
+        }
+        if (!DiaUtil.ehDiaUtil(novaDataVencimento)) {
+            throw new PrazoInvalidoException("O prazo deve cair em um dia útil (segunda a sexta)!");
         }
 
         Demanda demanda = demandaRepository.findById(id)
