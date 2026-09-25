@@ -31,6 +31,7 @@ public class UsuarioService {
         }
 
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        usuario.setStatus(StatusPadrao.ATIVO);
 
         return usuarioRepository.save(usuario);
     }
