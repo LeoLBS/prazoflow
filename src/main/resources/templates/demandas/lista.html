@@ -8,13 +8,15 @@
     <link rel="stylesheet" th:href="@{/css/painel.css}">
 </head>
 <body class="bg-light">
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Demandas</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Demandas</h1>
+    <div class="d-flex gap-2">
+        <a th:href="@{/painel/demandas/nova}" class="btn btn-primary btn-sm">+ Nova demanda</a>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-outline-secondary btn-sm">Sair</button>
         </form>
     </div>
+</div>
 
     <div class="table-responsive">
         <table class="table table-hover bg-white">
@@ -29,7 +31,10 @@
             <tbody>
             <tr th:each="demanda : ${pagina.content}">
                 <td th:text="${demanda.titulo}">Título</td>
-                <td th:text="${demanda.tecnico != null ? demanda.tecnico.nome : '—'}">Técnico</td>
+                <td>
+                    <span th:if="${demanda.tecnico != null}" th:text="${demanda.tecnico.nome}">Técnico</span>
+                    <span th:unless="${demanda.tecnico != null}" class="text-danger fw-semibold">Sem técnico</span>
+                </td>
                 <td th:text="${#temporals.format(demanda.dataVencimento, 'dd/MM/yyyy')}">Prazo</td>
                 <td th:text="${demanda.status}">Status</td>
             </tr>
