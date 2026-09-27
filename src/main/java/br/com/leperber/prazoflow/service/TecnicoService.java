@@ -24,10 +24,14 @@ public class TecnicoService {
         if(!StringUtils.hasText(tecnico.getNome())){
             throw new IllegalArgumentException("O Nome não pode ser vazio ou nulo!");
         }
-        if(StringUtils.hasText(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(tecnico.getCodigoIdDiscord())){
+
+        tecnico.setEmail(normalizarVazioParaNulo(tecnico.getEmail()));
+        tecnico.setCodigoIdDiscord(normalizarVazioParaNulo(tecnico.getCodigoIdDiscord()));
+
+        if(tecnico.getCodigoIdDiscord() != null && tecnicoRepository.existsByCodigoIdDiscord(tecnico.getCodigoIdDiscord())){
             throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
         }
-        if(StringUtils.hasText(tecnico.getEmail()) && tecnicoRepository.existsByEmail(tecnico.getEmail())){
+        if(tecnico.getEmail() != null && tecnicoRepository.existsByEmail(tecnico.getEmail())){
             throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
         }
 
@@ -123,19 +127,26 @@ public class TecnicoService {
         Tecnico tecnico = tecnicoRepository.findById(id)
                 .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
 
-        if (StringUtils.hasText(email) && !email.equals(tecnico.getEmail()) && tecnicoRepository.existsByEmail(email)) {
+        String emailNormalizado = normalizarVazioParaNulo(email);
+        String codigoIdDiscordNormalizado = normalizarVazioParaNulo(codigoIdDiscord);
+
+        if (emailNormalizado != null && !emailNormalizado.equals(tecnico.getEmail()) && tecnicoRepository.existsByEmail(emailNormalizado)) {
             throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
         }
 
-        if (StringUtils.hasText(codigoIdDiscord) && !codigoIdDiscord.equals(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscord)) {
+        if (codigoIdDiscordNormalizado != null && !codigoIdDiscordNormalizado.equals(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscordNormalizado)) {
             throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
         }
 
         tecnico.setNome(nome);
-        tecnico.setEmail(email);
-        tecnico.setCodigoIdDiscord(codigoIdDiscord);
+        tecnico.setEmail(emailNormalizado);
+        tecnico.setCodigoIdDiscord(codigoIdDiscordNormalizado);
 
         return tecnicoRepository.save(tecnico);
+    }
+
+    private String normalizarVazioParaNulo(String valor) {
+        return StringUtils.hasText(valor) ? valor : null;
     }
 
 }
