@@ -13,6 +13,7 @@ import br.com.leperber.prazoflow.util.DiaUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ public class DemandaService {
         this.notificacaoService = notificacaoService;
     }
 
+    @Transactional
     public Demanda criar(Demanda demanda) {
         if (!StringUtils.hasText(demanda.getTitulo())) {
             throw new IllegalArgumentException("O título não pode ser vazio ou nulo!");
@@ -50,9 +52,17 @@ public class DemandaService {
             throw new PrazoInvalidoException("O prazo deve cair em um dia útil (segunda a sexta)!");
         }
 
+        Tecnico tecnico = demanda.getTecnico();
+        demanda.setTecnico(null);
         demanda.setStatus(StatusDemanda.PENDENTE);
 
-        return demandaRepository.save(demanda);
+        Demanda salva = demandaRepository.save(demanda);
+
+        if (tecnico != null) {
+            salva = atribuirTecnico(salva.getId(), tecnico.getId());
+        }
+
+        return salva;
     }
 
     public Demanda buscarId(Long id) {
@@ -147,9 +157,20 @@ public class DemandaService {
             throw new IllegalArgumentException("Não é possível atribuir uma demanda a um técnico inativo!");
         }
 
-        if (!tecnico.equals(demanda.getTecnico())) {
+        Tecnico tecnicoAnterior = demanda.getTecnico();
+
+        if (!tecnico.equals(tecnicoAnterior)) {
             demanda.setTecnico(tecnico);
             demanda.reiniciarAlertas();
+
+            Demanda salva = demandaRepository.save(demanda);
+
+            if (tecnicoAnterior != null) {
+                notificacaoService.notificarDesvinculo(tecnicoAnterior, salva);
+            }
+            notificacaoService.notificarVinculo(salva);
+
+            return salva;
         }
 
         return demandaRepository.save(demanda);
