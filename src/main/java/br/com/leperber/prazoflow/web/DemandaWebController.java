@@ -1,9 +1,11 @@
 package br.com.leperber.prazoflow.web;
 
 import br.com.leperber.prazoflow.entity.Demanda;
+import br.com.leperber.prazoflow.entity.ResultadoNotificacao;
 import br.com.leperber.prazoflow.entity.StatusDemanda;
 import br.com.leperber.prazoflow.entity.Tecnico;
 import br.com.leperber.prazoflow.service.DemandaService;
+import br.com.leperber.prazoflow.service.NotificacaoService;
 import br.com.leperber.prazoflow.service.TecnicoService;
 import br.com.leperber.prazoflow.web.dto.DemandaFormDTO;
 import org.springframework.data.domain.Page;
@@ -26,10 +28,13 @@ public class DemandaWebController {
 
     private final DemandaService demandaService;
     private final TecnicoService tecnicoService;
+    private final NotificacaoService notificacaoService;
 
-    public DemandaWebController(DemandaService demandaService, TecnicoService tecnicoService) {
+    public DemandaWebController(DemandaService demandaService, TecnicoService tecnicoService,
+                                 NotificacaoService notificacaoService) {
         this.demandaService = demandaService;
         this.tecnicoService = tecnicoService;
+        this.notificacaoService = notificacaoService;
     }
 
     @GetMapping
@@ -47,7 +52,7 @@ public class DemandaWebController {
     }
 
     @PostMapping
-    public String salvar(@ModelAttribute DemandaFormDTO formulario, Model model) {
+    public String salvar(@ModelAttribute DemandaFormDTO formulario, Model model, RedirectAttributes redirectAttributes) {
         try {
             Demanda demanda = new Demanda();
             demanda.setTitulo(formulario.titulo());
@@ -60,7 +65,9 @@ public class DemandaWebController {
                 demanda.setTecnico(tecnico);
             }
 
-            demandaService.criar(demanda);
+            Demanda salva = demandaService.criar(demanda);
+
+            adicionarFlashDeConclusao("Demanda criada com sucesso.", salva.getResultadoUltimaNotificacao(), redirectAttributes);
 
             return "redirect:/painel/demandas";
         } catch (RuntimeException e) {
@@ -91,7 +98,8 @@ public class DemandaWebController {
     }
 
     @PostMapping("/{id}/editar")
-    public String atualizar(@PathVariable Long id, @ModelAttribute DemandaFormDTO formulario, Model model) {
+    public String atualizar(@PathVariable Long id, @ModelAttribute DemandaFormDTO formulario, Model model,
+                             RedirectAttributes redirectAttributes) {
         try {
             Demanda demanda = demandaService.buscarId(id);
 
@@ -109,9 +117,13 @@ public class DemandaWebController {
             }
 
             Long tecnicoAtualId = demanda.getTecnico() != null ? demanda.getTecnico().getId() : null;
+            ResultadoNotificacao resultadoNotificacao = null;
             if (formulario.tecnicoId() != null && !Objects.equals(formulario.tecnicoId(), tecnicoAtualId)) {
-                demandaService.atribuirTecnico(id, formulario.tecnicoId());
+                Demanda salva = demandaService.atribuirTecnico(id, formulario.tecnicoId());
+                resultadoNotificacao = salva.getResultadoUltimaNotificacao();
             }
+
+            adicionarFlashDeConclusao("Demanda atualizada com sucesso.", resultadoNotificacao, redirectAttributes);
 
             return "redirect:/painel/demandas";
         } catch (RuntimeException e) {
@@ -141,5 +153,34 @@ public class DemandaWebController {
             redirectAttributes.addFlashAttribute("erro", e.getMessage());
         }
         return "redirect:/painel/demandas";
+    }
+
+    @PostMapping("/{id}/reenviar-notificacao")
+    public String reenviarNotificacao(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Demanda demanda = demandaService.buscarId(id);
+        ResultadoNotificacao resultado = notificacaoService.notificarVinculo(demanda);
+
+        if (resultado.enviada()) {
+            redirectAttributes.addFlashAttribute("sucesso", resultado.detalhe());
+        } else {
+            redirectAttributes.addFlashAttribute("avisoNotificacao", resultado.detalhe());
+        }
+
+        return "redirect:/painel/demandas";
+    }
+
+    private void adicionarFlashDeConclusao(String mensagemBase, ResultadoNotificacao resultadoNotificacao,
+                                             RedirectAttributes redirectAttributes) {
+        if (resultadoNotificacao == null) {
+            redirectAttributes.addFlashAttribute("sucesso", mensagemBase);
+            return;
+        }
+
+        if (resultadoNotificacao.enviada()) {
+            redirectAttributes.addFlashAttribute("sucesso", mensagemBase + " " + resultadoNotificacao.detalhe());
+        } else {
+            redirectAttributes.addFlashAttribute("sucesso", mensagemBase);
+            redirectAttributes.addFlashAttribute("avisoNotificacao", resultadoNotificacao.detalhe());
+        }
     }
 }
