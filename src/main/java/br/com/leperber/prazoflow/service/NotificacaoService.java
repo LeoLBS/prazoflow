@@ -71,6 +71,14 @@ public class NotificacaoService {
                         .build());
     }
 
+    public ResultadoNotificacao notificarCancelamento(Demanda demanda) {
+        return enviarAoResponsavel(demanda.getTecnico(), demanda, "cancelamento", nome ->
+                DiscordNotificador.novoEmbedDeCancelamento()
+                        .setDescription("Olá, **%s**! A demanda **%s** foi cancelada e não precisa mais ser executada."
+                                .formatted(nome, demanda.getTitulo()))
+                        .build());
+    }
+
     private String formatarDiasRestantes(long diasRestantes) {
         if (diasRestantes < 0) {
             return "atrasado há " + Math.abs(diasRestantes) + (Math.abs(diasRestantes) == 1 ? " dia" : " dias");

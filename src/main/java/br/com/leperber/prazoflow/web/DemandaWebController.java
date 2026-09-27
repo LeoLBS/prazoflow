@@ -158,7 +158,12 @@ public class DemandaWebController {
     @PostMapping("/{id}/reenviar-notificacao")
     public String reenviarNotificacao(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Demanda demanda = demandaService.buscarId(id);
-        ResultadoNotificacao resultado = notificacaoService.notificarVinculo(demanda);
+
+        ResultadoNotificacao resultado = switch (demanda.getStatus()) {
+            case CONCLUIDO -> notificacaoService.notificarConclusao(demanda);
+            case CANCELADO -> notificacaoService.notificarCancelamento(demanda);
+            case PENDENTE, ATRASADO -> notificacaoService.notificarVinculo(demanda);
+        };
 
         if (resultado.enviada()) {
             redirectAttributes.addFlashAttribute("sucesso", resultado.detalhe());
