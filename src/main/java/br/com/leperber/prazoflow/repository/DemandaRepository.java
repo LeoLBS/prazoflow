@@ -2,12 +2,15 @@ package br.com.leperber.prazoflow.repository;
 
 import br.com.leperber.prazoflow.entity.Demanda;
 import br.com.leperber.prazoflow.entity.StatusDemanda;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface DemandaRepository extends JpaRepository<Demanda, Long> {
+    Page<Demanda> findByStatus(StatusDemanda status, Pageable pageable);
     List<Demanda> findByDataVencimentoAndStatus(LocalDate dataVencimento, StatusDemanda status);
     List<Demanda> findByStatusAndDataVencimentoBefore(StatusDemanda status, LocalDate dataVencimento);
     List<Demanda> findByTecnico_Id(Long tecnicoId);
