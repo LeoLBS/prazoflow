@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -32,6 +33,7 @@ public class TecnicoWebController {
     @GetMapping("/novo")
     public String novoFormulario(Model model) {
         model.addAttribute("tecnico", new Tecnico());
+        model.addAttribute("idEdicao", null);
         return "tecnicos/form";
     }
 
@@ -43,6 +45,27 @@ public class TecnicoWebController {
         } catch (RuntimeException e) {
             model.addAttribute("erro", e.getMessage());
             model.addAttribute("tecnico", tecnico);
+            model.addAttribute("idEdicao", null);
+            return "tecnicos/form";
+        }
+    }
+
+    @GetMapping("/{id}/editar")
+    public String editarFormulario(@PathVariable Long id, Model model) {
+        model.addAttribute("tecnico", tecnicoService.buscarId(id));
+        model.addAttribute("idEdicao", id);
+        return "tecnicos/form";
+    }
+
+    @PostMapping("/{id}/editar")
+    public String atualizar(@PathVariable Long id, @ModelAttribute Tecnico tecnico, Model model) {
+        try {
+            tecnicoService.atualizar(id, tecnico.getNome(), tecnico.getEmail(), tecnico.getCodigoIdDiscord());
+            return "redirect:/painel/tecnicos";
+        } catch (RuntimeException e) {
+            model.addAttribute("erro", e.getMessage());
+            model.addAttribute("tecnico", tecnico);
+            model.addAttribute("idEdicao", id);
             return "tecnicos/form";
         }
     }

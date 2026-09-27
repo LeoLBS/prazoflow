@@ -25,6 +25,7 @@
                 <th>Email</th>
                 <th>Discord ID</th>
                 <th>Status</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -33,9 +34,13 @@
                 <td th:text="${tecnico.email}">Email</td>
                 <td th:text="${tecnico.codigoIdDiscord} ?: '—'">Discord ID</td>
                 <td th:text="${tecnico.status}">Status</td>
+                <td>
+                    <a th:href="@{/painel/tecnicos/{id}/editar(id=${tecnico.id})}"
+                       class="btn btn-outline-secondary btn-sm">Editar</a>
+                </td>
             </tr>
             <tr th:if="${pagina.empty}">
-                <td colspan="4" class="text-center text-muted py-4">Nenhum técnico cadastrado ainda.</td>
+                <td colspan="5" class="text-center text-muted py-4">Nenhum técnico cadastrado ainda.</td>
             </tr>
             </tbody>
         </table>

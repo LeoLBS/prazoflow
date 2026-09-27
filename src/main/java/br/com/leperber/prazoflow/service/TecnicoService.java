@@ -115,4 +115,27 @@ public class TecnicoService {
         return tecnicoRepository.save(tecnico);
     }
 
+    public Tecnico atualizar(Long id, String nome, String email, String codigoIdDiscord){
+        if (!StringUtils.hasText(nome)){
+            throw new IllegalArgumentException("O Nome não pode ser vazio ou nulo!");
+        }
+
+        Tecnico tecnico = tecnicoRepository.findById(id)
+                .orElseThrow(() -> new TecnicoNaoEncontradoException("Tecnico não encontrado com o ID: " + id));
+
+        if (StringUtils.hasText(email) && !email.equals(tecnico.getEmail()) && tecnicoRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Foi identificado que o email ja está sendo utilizado por outro tecnico!");
+        }
+
+        if (StringUtils.hasText(codigoIdDiscord) && !codigoIdDiscord.equals(tecnico.getCodigoIdDiscord()) && tecnicoRepository.existsByCodigoIdDiscord(codigoIdDiscord)) {
+            throw new IllegalArgumentException("O código do ID do Discord ja está sendo utilizado por outro tecnico!");
+        }
+
+        tecnico.setNome(nome);
+        tecnico.setEmail(email);
+        tecnico.setCodigoIdDiscord(codigoIdDiscord);
+
+        return tecnicoRepository.save(tecnico);
+    }
+
 }
