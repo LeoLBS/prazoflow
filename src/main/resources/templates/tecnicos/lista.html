@@ -12,10 +12,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">Técnicos</h1>
         <div class="d-flex gap-2">
+            <a th:href="@{/painel}" class="btn btn-outline-secondary btn-sm">Início</a>
             <a th:href="@{/painel/demandas}" class="btn btn-outline-secondary btn-sm">Demandas</a>
             <a th:href="@{/painel/tecnicos/novo}" class="btn btn-primary btn-sm">+ Novo técnico</a>
         </div>
     </div>
+
+    <div th:if="${erro}" class="alert alert-danger" th:text="${erro}">Erro</div>
 
     <div class="table-responsive">
         <table class="table table-hover bg-white">
@@ -34,9 +37,16 @@
                 <td th:text="${tecnico.email}">Email</td>
                 <td th:text="${tecnico.codigoIdDiscord} ?: '—'">Discord ID</td>
                 <td th:text="${tecnico.status}">Status</td>
-                <td>
+                <td class="d-flex gap-2">
                     <a th:href="@{/painel/tecnicos/{id}/editar(id=${tecnico.id})}"
                        class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <form th:action="@{/painel/tecnicos/{id}/status(id=${tecnico.id})}" method="post">
+                        <button type="submit"
+                                th:class="${tecnico.status.name() == 'ATIVO'} ? 'btn btn-outline-danger btn-sm' : 'btn btn-outline-success btn-sm'"
+                                th:text="${tecnico.status.name() == 'ATIVO'} ? 'Inativar' : 'Reativar'">
+                            Alternar status
+                        </button>
+                    </form>
                 </td>
             </tr>
             <tr th:if="${pagina.empty}">

@@ -1,6 +1,7 @@
 package br.com.leperber.prazoflow.web;
 
 import br.com.leperber.prazoflow.entity.Demanda;
+import br.com.leperber.prazoflow.entity.StatusDemanda;
 import br.com.leperber.prazoflow.entity.Tecnico;
 import br.com.leperber.prazoflow.service.DemandaService;
 import br.com.leperber.prazoflow.service.TecnicoService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
 
@@ -119,5 +121,25 @@ public class DemandaWebController {
             model.addAttribute("idEdicao", id);
             return "demandas/form";
         }
+    }
+
+    @PostMapping("/{id}/concluir")
+    public String concluir(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            demandaService.alterarStatus(id, StatusDemanda.CONCLUIDO);
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/painel/demandas";
+    }
+
+    @PostMapping("/{id}/cancelar")
+    public String cancelar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            demandaService.alterarStatus(id, StatusDemanda.CANCELADO);
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/painel/demandas";
     }
 }
