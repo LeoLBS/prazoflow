@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
 @Service
@@ -28,7 +29,7 @@ public class NotificacaoService {
     }
 
     public void notificarReagendamento(Demanda demanda, LocalDate dataAnterior) {
-        enviarAoResponsavel(demanda, "reagendamento", nome ->
+        enviarAoResponsavel(demanda.getTecnico(), demanda, "reagendamento", nome ->
                 DiscordNotificador.novoEmbedDeReagendamento()
                         .setDescription("Olá, **%s**! O prazo da demanda **%s** foi reagendado."
                                 .formatted(nome, demanda.getTitulo()))
@@ -38,15 +39,45 @@ public class NotificacaoService {
     }
 
     public void notificarConclusao(Demanda demanda) {
-        enviarAoResponsavel(demanda, "conclusao", nome ->
+        enviarAoResponsavel(demanda.getTecnico(), demanda, "conclusao", nome ->
                 DiscordNotificador.novoEmbedDeConclusao()
                         .setDescription("Parabéns, **%s**! A demanda **%s** foi concluída. Obrigado pela entrega! 🎉"
                                 .formatted(nome, demanda.getTitulo()))
                         .build());
     }
 
-    private void enviarAoResponsavel(Demanda demanda, String tipo, Function<String, MessageEmbed> montarEmbed) {
-        Tecnico tecnico = demanda.getTecnico();
+    public void notificarVinculo(Demanda demanda) {
+        enviarAoResponsavel(demanda.getTecnico(), demanda, "vinculo", nome -> {
+            long diasRestantes = ChronoUnit.DAYS.between(LocalDate.now(), demanda.getDataVencimento());
+
+            return DiscordNotificador.novoEmbedDeVinculo()
+                    .setDescription("Olá, **%s**! A demanda **%s** foi vinculada a você."
+                            .formatted(nome, demanda.getTitulo()))
+                    .addField("Prazo", demanda.getDataVencimento().format(FORMATO_DATA), true)
+                    .addField("Dias restantes", formatarDiasRestantes(diasRestantes), true)
+                    .build();
+        });
+    }
+
+    public void notificarDesvinculo(Tecnico tecnicoAnterior, Demanda demanda) {
+        enviarAoResponsavel(tecnicoAnterior, demanda, "desvinculo", nome ->
+                DiscordNotificador.novoEmbedDeDesvinculo()
+                        .setDescription("Olá, **%s**! A demanda **%s** foi removida de você e não é mais de sua responsabilidade."
+                                .formatted(nome, demanda.getTitulo()))
+                        .build());
+    }
+
+    private String formatarDiasRestantes(long diasRestantes) {
+        if (diasRestantes < 0) {
+            return "atrasado há " + Math.abs(diasRestantes) + (Math.abs(diasRestantes) == 1 ? " dia" : " dias");
+        }
+        if (diasRestantes == 0) {
+            return "vence hoje";
+        }
+        return diasRestantes == 1 ? "falta 1 dia" : "faltam " + diasRestantes + " dias";
+    }
+
+    private void enviarAoResponsavel(Tecnico tecnico, Demanda demanda, String tipo, Function<String, MessageEmbed> montarEmbed) {
         if (tecnico == null
                 || tecnico.getStatus() != StatusPadrao.ATIVO
                 || !StringUtils.hasText(tecnico.getCodigoIdDiscord())) {

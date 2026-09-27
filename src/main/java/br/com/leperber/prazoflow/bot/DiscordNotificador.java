@@ -23,6 +23,8 @@ public class DiscordNotificador {
 
     private static final Color COR_CONCLUSAO = new Color(46, 204, 113);      // verde
     private static final Color COR_REAGENDAMENTO = new Color(52, 152, 219);  // azul
+    private static final Color COR_VINCULO = new Color(155, 89, 182);        // roxo
+    private static final Color COR_DESVINCULO = new Color(149, 165, 166);    // cinza
 
     private final JDA jda;
 
@@ -63,6 +65,20 @@ public class DiscordNotificador {
         return new EmbedBuilder()
                 .setTitle("🔄 Prazo reagendado")
                 .setColor(COR_REAGENDAMENTO)
+                .setFooter("PrazoFlow • gerado automaticamente");
+    }
+
+    public static EmbedBuilder novoEmbedDeVinculo() {
+        return new EmbedBuilder()
+                .setTitle("📌 Nova demanda vinculada a você")
+                .setColor(COR_VINCULO)
+                .setFooter("PrazoFlow • gerado automaticamente");
+    }
+
+    public static EmbedBuilder novoEmbedDeDesvinculo() {
+        return new EmbedBuilder()
+                .setTitle("↩️ Demanda removida de você")
+                .setColor(COR_DESVINCULO)
                 .setFooter("PrazoFlow • gerado automaticamente");
     }
 }
