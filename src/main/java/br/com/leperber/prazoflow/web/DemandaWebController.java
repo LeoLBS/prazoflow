@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
@@ -38,9 +39,11 @@ public class DemandaWebController {
     }
 
     @GetMapping
-    public String listar(@PageableDefault(size = 20) Pageable pageable, Model model) {
-        Page<Demanda> pagina = demandaService.buscarDemandas(pageable);
+    public String listar(@PageableDefault(size = 20) Pageable pageable, Model model,
+                          @RequestParam(required = false) StatusDemanda status) {
+        Page<Demanda> pagina = demandaService.buscarDemandas(status, pageable);
         model.addAttribute("pagina", pagina);
+        model.addAttribute("statusSelecionado", status);
         return "demandas/lista";
     }
 

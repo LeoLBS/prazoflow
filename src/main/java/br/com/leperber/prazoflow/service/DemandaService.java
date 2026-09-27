@@ -74,6 +74,13 @@ public class DemandaService {
         return demandaRepository.findAll(pageable);
     }
 
+    public Page<Demanda> buscarDemandas(StatusDemanda status, Pageable pageable) {
+        if (status == null) {
+            return demandaRepository.findAll(pageable);
+        }
+        return demandaRepository.findByStatus(status, pageable);
+    }
+
     public List<Demanda> buscarPorTecnico(Long tecnicoId) {
         return demandaRepository.findByTecnico_Id(tecnicoId);
     }

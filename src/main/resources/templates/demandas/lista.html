@@ -24,6 +24,19 @@
     <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}">Sucesso</div>
     <div th:if="${avisoNotificacao}" class="alert alert-warning" th:text="${avisoNotificacao}">Aviso</div>
 
+    <div class="btn-group mb-3" role="group">
+        <a th:href="@{/painel/demandas}"
+           th:class="${statusSelecionado == null} ? 'btn btn-dark btn-sm' : 'btn btn-outline-dark btn-sm'">Todos</a>
+        <a th:href="@{/painel/demandas(status='PENDENTE')}"
+           th:class="${statusSelecionado != null and statusSelecionado.name() == 'PENDENTE'} ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm'">Pendente</a>
+        <a th:href="@{/painel/demandas(status='ATRASADO')}"
+           th:class="${statusSelecionado != null and statusSelecionado.name() == 'ATRASADO'} ? 'btn btn-danger btn-sm' : 'btn btn-outline-danger btn-sm'">Atrasado</a>
+        <a th:href="@{/painel/demandas(status='CONCLUIDO')}"
+           th:class="${statusSelecionado != null and statusSelecionado.name() == 'CONCLUIDO'} ? 'btn btn-success btn-sm' : 'btn btn-outline-success btn-sm'">Concluído</a>
+        <a th:href="@{/painel/demandas(status='CANCELADO')}"
+           th:class="${statusSelecionado != null and statusSelecionado.name() == 'CANCELADO'} ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'">Cancelado</a>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-hover bg-white">
             <thead>
@@ -43,7 +56,14 @@
                     <span th:unless="${demanda.tecnico != null}" class="text-danger fw-semibold">Sem técnico</span>
                 </td>
                 <td th:text="${#temporals.format(demanda.dataVencimento, 'dd/MM/yyyy')}">Prazo</td>
-                <td th:text="${demanda.status}">Status</td>
+                <td>
+                    <span th:switch="${demanda.status.name()}" class="badge">
+                        <span th:case="'PENDENTE'" class="badge bg-primary">Pendente</span>
+                        <span th:case="'ATRASADO'" class="badge bg-danger">Atrasado</span>
+                        <span th:case="'CONCLUIDO'" class="badge bg-success">Concluído</span>
+                        <span th:case="'CANCELADO'" class="badge bg-secondary">Cancelado</span>
+                    </span>
+                </td>
                 <td class="d-flex gap-2">
                     <a th:href="@{/painel/demandas/{id}/editar(id=${demanda.id})}"
                        class="btn btn-outline-secondary btn-sm">Editar</a>
@@ -62,7 +82,7 @@
                 </td>
             </tr>
             <tr th:if="${pagina.empty}">
-                <td colspan="5" class="text-center text-muted py-4">Nenhuma demanda cadastrada ainda.</td>
+                <td colspan="5" class="text-center text-muted py-4">Nenhuma demanda encontrada.</td>
             </tr>
             </tbody>
         </table>
