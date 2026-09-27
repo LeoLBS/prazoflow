@@ -25,6 +25,7 @@ public class DiscordNotificador {
     private static final Color COR_REAGENDAMENTO = new Color(52, 152, 219);  // azul
     private static final Color COR_VINCULO = new Color(155, 89, 182);        // roxo
     private static final Color COR_DESVINCULO = new Color(149, 165, 166);    // cinza
+    private static final Color COR_CANCELAMENTO = new Color(108, 117, 125); // cinza escuro
 
     private final JDA jda;
 
@@ -79,6 +80,13 @@ public class DiscordNotificador {
         return new EmbedBuilder()
                 .setTitle("↩️ Demanda removida de você")
                 .setColor(COR_DESVINCULO)
+                .setFooter("PrazoFlow • gerado automaticamente");
+    }
+
+    public static EmbedBuilder novoEmbedDeCancelamento() {
+        return new EmbedBuilder()
+                .setTitle("🚫 Demanda cancelada")
+                .setColor(COR_CANCELAMENTO)
                 .setFooter("PrazoFlow • gerado automaticamente");
     }
 }

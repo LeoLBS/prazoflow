@@ -194,6 +194,8 @@ public class DemandaService {
 
         if (statusDemanda == StatusDemanda.CONCLUIDO) {
             notificacaoService.notificarConclusao(salva);
+        } else if (statusDemanda == StatusDemanda.CANCELADO) {
+            notificacaoService.notificarCancelamento(salva);
         }
 
         return salva;
