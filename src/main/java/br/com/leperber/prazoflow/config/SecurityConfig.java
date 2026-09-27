@@ -46,7 +46,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/painel/demandas")
+                        .defaultSuccessUrl("/painel")
                         .permitAll()
                 )
                 .logout(logout -> logout

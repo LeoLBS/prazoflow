@@ -1,5 +1,6 @@
 package br.com.leperber.prazoflow.web;
 
+import br.com.leperber.prazoflow.entity.StatusPadrao;
 import br.com.leperber.prazoflow.entity.Tecnico;
 import br.com.leperber.prazoflow.service.TecnicoService;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/painel/tecnicos")
@@ -68,5 +70,19 @@ public class TecnicoWebController {
             model.addAttribute("idEdicao", id);
             return "tecnicos/form";
         }
+    }
+
+    @PostMapping("/{id}/status")
+    public String alternarStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            Tecnico tecnico = tecnicoService.buscarId(id);
+            StatusPadrao novoStatus = tecnico.getStatus() == StatusPadrao.ATIVO
+                    ? StatusPadrao.INATIVO
+                    : StatusPadrao.ATIVO;
+            tecnicoService.alterarStatus(id, novoStatus);
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/painel/tecnicos";
     }
 }

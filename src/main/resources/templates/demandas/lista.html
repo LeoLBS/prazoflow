@@ -11,12 +11,16 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Demandas</h1>
     <div class="d-flex gap-2">
+        <a th:href="@{/painel}" class="btn btn-outline-secondary btn-sm">Início</a>
+        <a th:href="@{/painel/tecnicos}" class="btn btn-outline-secondary btn-sm">Técnicos</a>
         <a th:href="@{/painel/demandas/nova}" class="btn btn-primary btn-sm">+ Nova demanda</a>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-outline-secondary btn-sm">Sair</button>
         </form>
     </div>
 </div>
+
+    <div th:if="${erro}" class="alert alert-danger" th:text="${erro}">Erro</div>
 
     <div class="table-responsive">
         <table class="table table-hover bg-white">
@@ -38,9 +42,17 @@
                 </td>
                 <td th:text="${#temporals.format(demanda.dataVencimento, 'dd/MM/yyyy')}">Prazo</td>
                 <td th:text="${demanda.status}">Status</td>
-                <td>
+                <td class="d-flex gap-2">
                     <a th:href="@{/painel/demandas/{id}/editar(id=${demanda.id})}"
                        class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <th:block th:if="${demanda.status.name() == 'PENDENTE' or demanda.status.name() == 'ATRASADO'}">
+                        <form th:action="@{/painel/demandas/{id}/concluir(id=${demanda.id})}" method="post">
+                            <button type="submit" class="btn btn-outline-success btn-sm">Concluir</button>
+                        </form>
+                        <form th:action="@{/painel/demandas/{id}/cancelar(id=${demanda.id})}" method="post">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Cancelar</button>
+                        </form>
+                    </th:block>
                 </td>
             </tr>
             <tr th:if="${pagina.empty}">
