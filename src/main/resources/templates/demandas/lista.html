@@ -26,6 +26,7 @@
                 <th>Técnico</th>
                 <th>Prazo</th>
                 <th>Status</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -37,9 +38,13 @@
                 </td>
                 <td th:text="${#temporals.format(demanda.dataVencimento, 'dd/MM/yyyy')}">Prazo</td>
                 <td th:text="${demanda.status}">Status</td>
+                <td>
+                    <a th:href="@{/painel/demandas/{id}/editar(id=${demanda.id})}"
+                       class="btn btn-outline-secondary btn-sm">Editar</a>
+                </td>
             </tr>
             <tr th:if="${pagina.empty}">
-                <td colspan="4" class="text-center text-muted py-4">Nenhuma demanda cadastrada ainda.</td>
+                <td colspan="5" class="text-center text-muted py-4">Nenhuma demanda cadastrada ainda.</td>
             </tr>
             </tbody>
         </table>

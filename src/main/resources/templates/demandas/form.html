@@ -2,18 +2,19 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>PrazoFlow - Nova Demanda</title>
+    <title th:text="${idEdicao == null} ? 'PrazoFlow - Nova Demanda' : 'PrazoFlow - Editar Demanda'">PrazoFlow - Demanda</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" th:href="@{/css/painel.css}">
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h1 class="h3 mb-4">Nova Demanda</h1>
+    <h1 class="h3 mb-4" th:text="${idEdicao == null} ? 'Nova Demanda' : 'Editar Demanda'">Demanda</h1>
 
     <div th:if="${erro}" class="alert alert-danger" th:text="${erro}">Erro</div>
 
-    <form th:action="@{/painel/demandas}" method="post" class="card p-4 shadow-sm bg-white">
+    <form th:action="${idEdicao == null} ? @{/painel/demandas} : @{/painel/demandas/{id}/editar(id=${idEdicao})}"
+          method="post" class="card p-4 shadow-sm bg-white">
         <div class="mb-3">
             <label for="titulo" class="form-label">Título</label>
             <input type="text" class="form-control" id="titulo" name="titulo"
@@ -38,7 +39,8 @@
                 <option value="">Sem técnico atribuído</option>
                 <option th:each="tecnico : ${tecnicos}"
                         th:value="${tecnico.id}"
-                        th:text="${tecnico.nome}">
+                        th:text="${tecnico.nome}"
+                        th:selected="${formulario != null and formulario.tecnicoId() == tecnico.id}">
                     Nome do técnico
                 </option>
             </select>
@@ -51,7 +53,7 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="submit" class="btn btn-primary" th:text="${idEdicao == null} ? 'Salvar' : 'Atualizar'">Salvar</button>
             <a th:href="@{/painel/demandas}" class="btn btn-outline-secondary">Cancelar</a>
         </div>
     </form>
