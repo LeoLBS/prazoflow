@@ -21,6 +21,8 @@
 </div>
 
     <div th:if="${erro}" class="alert alert-danger" th:text="${erro}">Erro</div>
+    <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}">Sucesso</div>
+    <div th:if="${avisoNotificacao}" class="alert alert-warning" th:text="${avisoNotificacao}">Aviso</div>
 
     <div class="table-responsive">
         <table class="table table-hover bg-white">
@@ -45,6 +47,10 @@
                 <td class="d-flex gap-2">
                     <a th:href="@{/painel/demandas/{id}/editar(id=${demanda.id})}"
                        class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <form th:if="${demanda.tecnico != null}"
+                          th:action="@{/painel/demandas/{id}/reenviar-notificacao(id=${demanda.id})}" method="post">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Reenviar notificação</button>
+                    </form>
                     <th:block th:if="${demanda.status.name() == 'PENDENTE' or demanda.status.name() == 'ATRASADO'}">
                         <form th:action="@{/painel/demandas/{id}/concluir(id=${demanda.id})}" method="post">
                             <button type="submit" class="btn btn-outline-success btn-sm">Concluir</button>

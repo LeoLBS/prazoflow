@@ -168,7 +168,7 @@ public class DemandaService {
             if (tecnicoAnterior != null) {
                 notificacaoService.notificarDesvinculo(tecnicoAnterior, salva);
             }
-            notificacaoService.notificarVinculo(salva);
+            salva.setResultadoUltimaNotificacao(notificacaoService.notificarVinculo(salva));
 
             return salva;
         }

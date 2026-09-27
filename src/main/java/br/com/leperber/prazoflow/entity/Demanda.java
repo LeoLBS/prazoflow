@@ -30,6 +30,9 @@ public class Demanda {
     @Column(nullable = false, name = "alerta_atraso_enviado")
     private boolean alertaAtrasoEnviado;
 
+    @Transient
+    private ResultadoNotificacao resultadoUltimaNotificacao;
+
     public Demanda() {}
 
     public Demanda(String titulo, String descricao, LocalDate dataVencimento, String observacao) {
@@ -74,6 +77,14 @@ public class Demanda {
 
     public boolean isAlertaAtrasoEnviado() {
         return alertaAtrasoEnviado;
+    }
+
+    public ResultadoNotificacao getResultadoUltimaNotificacao() {
+        return resultadoUltimaNotificacao;
+    }
+
+    public void setResultadoUltimaNotificacao(ResultadoNotificacao resultadoUltimaNotificacao) {
+        this.resultadoUltimaNotificacao = resultadoUltimaNotificacao;
     }
 
     public void setTitulo(String titulo) {
