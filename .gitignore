@@ -96,6 +96,7 @@ buildNumber.properties
 .env
 
 application-local.properties
+application-prod.properties
 
 HELP.md
 target/
