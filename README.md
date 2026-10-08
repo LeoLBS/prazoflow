@@ -26,13 +26,22 @@ O **PrazoFlow** nasceu para resolver esse problema no meu próprio setor, e tamb
 - **Java 21 LTS** (Eclipse Temurin)
 - **Spring Boot 3.x** (Web, Data JPA, Security, Scheduling, Validation)
 - **JDA 6.x** — integração com a API do Discord (WebSocket Gateway)
-- **H2** (desenvolvimento) / **PostgreSQL** (produção)
+- **PostgreSQL** (produção) / **H2** (desenvolvimento)
+- **Flyway** — versionamento e migração de schema
 - **Thymeleaf + Bootstrap 5** — painel web
 - **Maven**
 
+## Deploy em produção
+
+O PrazoFlow roda hoje em uso real, 24/7, numa máquina do meu setor:
+
+- Banco **PostgreSQL** dedicado, com usuário de aplicação de privilégio restrito (sem usar o superusuário do banco) e schema versionado via **Flyway migrations**.
+- Aplicação empacotada como `.jar` e registrada como **serviço do Windows** (via NSSM), garantindo que ela suba sozinha após reinício da máquina, sem depender de terminal aberto ou usuário logado.
+- Configuração de ambiente (credenciais, host do banco, token do bot) isolada em variáveis de ambiente — nenhum segredo versionado no repositório.
+
 ## Status atual do projeto
 
-✅ **v1.0.0** — escopo inicial completo e em uso real.
+✅ **v1.1.0** — escopo inicial completo, rodando em produção real.
 
 - [x] Modelagem de entidades (`Tecnico`, `Demanda`, `Usuario`)
 - [x] Camada de repositórios (Spring Data JPA)
@@ -43,6 +52,8 @@ O **PrazoFlow** nasceu para resolver esse problema no meu próprio setor, e tamb
 - [x] Bot Discord (JDA) — envio de DMs individuais e privadas
 - [x] Job agendado de verificação diária de prazos e atrasos
 - [x] Notificações de vínculo, desvínculo, conclusão, cancelamento e reagendamento
+- [x] Migração de schema versionada com Flyway
+- [x] Deploy em produção com PostgreSQL, validado em uso real e resiliente a reinício da máquina
 
 ## Rodando o projeto localmente
 
