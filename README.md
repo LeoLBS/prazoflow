@@ -4,11 +4,9 @@ Sistema de gestão de demandas de documentação técnica, com alertas automáti
 
 ## O problema
 
-Como Analista de Suporte, uma das minhas responsabilidades é avaliar chamados resolvidos pela equipe e, quando a solução adotada merece virar conhecimento formal, transformar aquele chamado em uma tarefa de documentação — um manual técnico, atribuído a um responsável, com prazo de entrega. Hoje esse acompanhamento é manual, e prazos acabam esquecidos no meio da rotina de suporte.
+Como Analista de Suporte, uma das minhas responsabilidades é avaliar chamados resolvidos pela equipe e, quando a solução adotada merece virar conhecimento formal, transformar aquele chamado em uma tarefa de documentação — um manual técnico, atribuído a um responsável, com prazo de entrega. Esse acompanhamento costuma ser manual, e prazos acabam esquecidos no meio da rotina de suporte.
 
-O **PrazoFlow** nasceu para resolver esse problema no meu próprio setor, e também como projeto de estudo — aplicando na prática conceitos de Java e Spring que venho aprendendo.
-
-> ⚠️ Este é um projeto de iniciativa pessoal, usado de forma real no meu setor de trabalho, mas **não é uma ferramenta homologada ou disponibilizada oficialmente pela empresa**.
+O **PrazoFlow** nasceu para resolver esse problema, e também como projeto de estudo — aplicando na prática conceitos de Java e Spring que venho aprendendo.
 
 ## Como funciona
 
@@ -33,15 +31,16 @@ O **PrazoFlow** nasceu para resolver esse problema no meu próprio setor, e tamb
 
 ## Deploy em produção
 
-O PrazoFlow roda hoje em uso real, 24/7, numa máquina do meu setor:
+O PrazoFlow foi validado em um ambiente de produção real:
 
 - Banco **PostgreSQL** dedicado, com usuário de aplicação de privilégio restrito (sem usar o superusuário do banco) e schema versionado via **Flyway migrations**.
 - Aplicação empacotada como `.jar` e registrada como **serviço do Windows** (via NSSM), garantindo que ela suba sozinha após reinício da máquina, sem depender de terminal aberto ou usuário logado.
 - Configuração de ambiente (credenciais, host do banco, token do bot) isolada em variáveis de ambiente — nenhum segredo versionado no repositório.
+- Testado com resiliência a reinício de máquina, sem intervenção manual.
 
 ## Status atual do projeto
 
-✅ **v1.1.0** — escopo inicial completo, rodando em produção real.
+✅ **v1.1.0** — escopo inicial completo, validado em ambiente de produção real.
 
 - [x] Modelagem de entidades (`Tecnico`, `Demanda`, `Usuario`)
 - [x] Camada de repositórios (Spring Data JPA)
@@ -53,7 +52,7 @@ O PrazoFlow roda hoje em uso real, 24/7, numa máquina do meu setor:
 - [x] Job agendado de verificação diária de prazos e atrasos
 - [x] Notificações de vínculo, desvínculo, conclusão, cancelamento e reagendamento
 - [x] Migração de schema versionada com Flyway
-- [x] Deploy em produção com PostgreSQL, validado em uso real e resiliente a reinício da máquina
+- [x] Deploy validado em produção com PostgreSQL, resiliente a reinício da máquina
 
 ## Rodando o projeto localmente
 
@@ -94,4 +93,4 @@ br.com.leperber.prazoflow
 
 ## Autor
 
-Desenvolvido por [Leonardo Perin de Berso](https://github.com/LeoLBS) como projeto pessoal de estudo e uso real no setor de suporte técnico.
+Desenvolvido por [Leonardo Perin de Berso](https://github.com/LeoLBS) como projeto pessoal de estudo, inspirado em um problema real da área de suporte técnico.
