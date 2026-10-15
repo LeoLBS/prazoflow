@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>br.com.leperber</groupId>
 	<artifactId>prazoflow</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<name>PrazoFlow</name>
 	<description>Gestão de demandas de documentação técnica com alertas automáticos via Discord</description>
 	<url>https://github.com/LeoLBS/prazoflow</url>
